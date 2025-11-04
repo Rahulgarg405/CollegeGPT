@@ -1,9 +1,10 @@
-require("dotenv").config();
-const prisma = require("../utils/prismaClient");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+import dotenv from "dotenv";
+dotenv.config();
+import prisma from "../utils/prismaClient.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
-const register = async (req, res) => {
+export const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
@@ -36,7 +37,7 @@ const register = async (req, res) => {
   }
 };
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -69,5 +70,3 @@ const login = async (req, res) => {
     res.status(500).json({ message: "Error in login", error: error.message });
   }
 };
-
-module.exports = { register, login };

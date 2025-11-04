@@ -1,13 +1,17 @@
-require("dotenv").config();
-const express = require("express");
-const authMiddleware = require("../middlewares/auth.middleware");
-const adminMiddleware = require("../middlewares/admin.middleware");
+import dotenv from "dotenv";
+dotenv.config();
+import express from "express";
+import authMiddleware from "../middlewares/auth.middleware.js";
+import adminMiddleware from "../middlewares/admin.middleware.js";
+import { upload, uploadSyllabus } from "../controllers/admin.controller.js";
 const router = express.Router();
 
-router.post("/upload", authMiddleware, adminMiddleware, (req, res) => {
-  res.json({
-    message: "Syllabus uploaded (Admin Only routes).",
-  });
-});
+router.post(
+  "/upload",
+  authMiddleware,
+  adminMiddleware,
+  upload.single("file"),
+  uploadSyllabus
+);
 
-module.exports = router;
+export default router;
