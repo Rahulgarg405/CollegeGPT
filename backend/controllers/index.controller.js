@@ -1,5 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
+process.env.HTTPS_PROXY = "";
+process.env.HTTP_PROXY = "";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
@@ -23,7 +25,7 @@ export const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
   maxConcurrency: 5,
 });
 
-export async function indexDocument(PDF_PATH, semester) {
+export async function indexDocument(PDF_PATH, semester, branch) {
   try {
     const pdfLoader = new PDFLoader(PDF_PATH);
     const rawDocs = await pdfLoader.load();
@@ -37,23 +39,34 @@ export async function indexDocument(PDF_PATH, semester) {
 
     //   console.log(chunkedDocs.length);
 
-    const docsWithMetadata = chunkedDocs.map((doc, i) => ({
-      ...doc,
-      metadata: {
+    // 1. Modify the metadata on the existing Document objects
+    chunkedDocs.forEach((doc) => {
+      doc.metadata = {
         ...doc.metadata,
-        semester: semester, // Add semester info
+        semester: semester,
+        branch: branch,
         type: "syllabus",
-      },
-    }));
-
-    // Delete old syllabus data for this semester (if needed)
-    await pineconeIndex.delete({
-      deleteAll: false,
-      filter: { semester: semester },
+      };
     });
 
+    // 2. Create a separate array of IDs
+    const docIds = chunkedDocs.map((_, i) => `${branch}-sem${semester}-${i}`);
+
+    // 3. FIX: Use Pinecone's $eq (equals) operator for the filter
+    const filter = {
+      branch: { $eq: branch },
+      semester: { $eq: semester },
+      type: { $eq: "syllabus" }, // Be specific to avoid deleting other data
+    };
+
+    // console.log("🧹 Deleting old syllabus for", filter);
+
+    // await pineconeIndex.namespace("").deleteAll({ filter: filter });
+
+    // console.log(`🧹 Old syllabus deleted for ${branch} sem ${semester}`);
+
     // Add updated syllabus :
-    await vectorStore.addDocuments(docsWithMetadata);
+    await vectorStore.addDocuments(chunkedDocs, { ids: docIds });
 
     console.log(`Indexed syllabus for semester ${semester}`);
     return { message: `Indexed syllabus for semester ${semester}` };
