@@ -25,7 +25,12 @@ export const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
   maxConcurrency: 5,
 });
 
-export async function indexDocument(PDF_PATH, semester, branch) {
+export async function indexDocument(
+  PDF_PATH,
+  semester,
+  branch,
+  type = "syllabus"
+) {
   try {
     const pdfLoader = new PDFLoader(PDF_PATH);
     const rawDocs = await pdfLoader.load();
@@ -43,21 +48,23 @@ export async function indexDocument(PDF_PATH, semester, branch) {
     chunkedDocs.forEach((doc) => {
       doc.metadata = {
         ...doc.metadata,
-        semester: semester,
-        branch: branch,
-        type: "syllabus",
+        semester: semester || null,
+        branch: branch || null,
+        type,
       };
     });
 
     // 2. Create a separate array of IDs
-    const docIds = chunkedDocs.map((_, i) => `${branch}-sem${semester}-${i}`);
+    const docIds = chunkedDocs.map(
+      (_, i) => `${branch || "common"}-sem${semester || "NA"}--${type}-${i}`
+    );
 
     // 3. FIX: Use Pinecone's $eq (equals) operator for the filter
-    const filter = {
-      branch: { $eq: branch },
-      semester: { $eq: semester },
-      type: { $eq: "syllabus" }, // Be specific to avoid deleting other data
-    };
+    // const filter = {
+    //   branch: { $eq: branch },
+    //   semester: { $eq: semester },
+    //   type: { $eq: "syllabus" },
+    // };
 
     // console.log("🧹 Deleting old syllabus for", filter);
 
