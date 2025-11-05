@@ -21,7 +21,7 @@ export default function Admin() {
 
     try {
       const token = localStorage.getItem("authToken");
-      const res = await fetch("http://localhost:3000/api/admin/upload-syllabus", {
+      const res = await fetch("http://localhost:3000/api/admin/upload", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -40,11 +40,15 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-accent flex flex-col items-center pt-24 px-4">
       {/* Page Title */}
-      <h1 className="text-4xl font-semibold mb-8 tracking-tight">Admin Dashboard</h1>
+      <h1 className="text-4xl font-semibold mb-8 tracking-tight">
+        Admin Dashboard
+      </h1>
 
       {/* Section: Syllabus Upload */}
       <div className="w-full max-w-lg bg-white/70 backdrop-blur-glass shadow-smooth rounded-2xl p-8 space-y-6">
-        <h2 className="text-2xl font-semibold text-center mb-4">Syllabus Upload</h2>
+        <h2 className="text-2xl font-semibold text-center mb-4">
+          Syllabus Upload
+        </h2>
 
         <form onSubmit={handleUpload} className="space-y-5">
           {/* File Input */}

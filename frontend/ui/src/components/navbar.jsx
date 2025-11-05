@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 
 export default function Navbar() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, userType, logout } = useAuth(); // 👈 get userType too
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -19,7 +19,17 @@ export default function Navbar() {
         CollegeGPT
       </h1>
 
-      <div className="flex space-x-3">
+      <div className="flex space-x-3 items-center">
+        {/* 👇 Show Admin Button only if admin is logged in */}
+        {isAuthenticated && userType === "admin" && (
+          <button
+            onClick={() => navigate("/admin")}
+            className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
+          >
+            Admin Dashboard
+          </button>
+        )}
+
         {!isAuthenticated ? (
           <>
             <Link to="/login" className="text-gray-800 hover:text-black">

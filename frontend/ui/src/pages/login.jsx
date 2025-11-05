@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/authContext"; 
+import { useAuth } from "../context/authContext";
 import InputField from "../components/inputFeild";
 import Button from "../components/button";
 
@@ -24,10 +24,11 @@ export default function Login() {
       console.log("Login response:", data);
 
       if (data?.token) {
-        login(data.token);
-        localStorage.setItem("authToken", data.token);
-        alert("Login successful!");
+        login(data.token, data.user.type);
+
         console.log("Token saved:", localStorage.getItem("authToken"));
+        console.log("User type saved:", localStorage.getItem("userType"));
+
         navigate("/");
       } else {
         alert("Invalid email or password");

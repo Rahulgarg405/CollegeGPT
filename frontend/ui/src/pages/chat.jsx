@@ -23,16 +23,18 @@ export default function Chat() {
     setLoading(true);
 
     try {
-      // yha pe bs tere backend me api/chat tha dekh lena 
-      const res = await fetch("http://localhost:3000/api/chat/query", {
+      // yha pe bs tere backend me api/chat tha dekh lena
+      const res = await fetch("http://localhost:3000/api/chat/chatbot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ message: query }),
       });
 
       const data = await res.json();
 
-      if (!data || !data.answer) {
+      // console.log(data.message);
+
+      if (!data || !data.message) {
         setMessages((prev) => [
           ...prev,
           { id: Date.now() + 1, text: "No data found.", sender: "bot" },
@@ -40,7 +42,7 @@ export default function Chat() {
       } else {
         setMessages((prev) => [
           ...prev,
-          { id: Date.now() + 1, text: data.answer, sender: "bot" },
+          { id: Date.now() + 1, text: data.message, sender: "bot" },
         ]);
       }
     } catch (error) {
@@ -60,9 +62,7 @@ export default function Chat() {
 
   return (
     <div className="flex flex-col h-screen bg-accent pt-20 items-center">
-      <div
-        className="w-full max-w-2xl bg-white/70 backdrop-blur-glass shadow-smooth rounded-2xl flex flex-col h-[80vh] overflow-hidden"
-      >
+      <div className="w-full max-w-2xl bg-white/70 backdrop-blur-glass shadow-smooth rounded-2xl flex flex-col h-[80vh] overflow-hidden">
         {/* Chat Window */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {messages.length === 0 && (
