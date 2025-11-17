@@ -4,6 +4,7 @@ import Button from "../components/button";
 export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [query, setQuery] = useState("");
+  const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef(null);
 
@@ -27,7 +28,14 @@ export default function Chat() {
       const res = await fetch("http://localhost:3000/api/chat/chatbot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: query }),
+        body: JSON.stringify({
+          message: query,
+          summary,
+          recentMessages: messages.slice(-4).map((m) => ({
+            role: m.sender === "user" ? "user" : "assistant",
+            content: m.text,
+          })),
+        }),
       });
 
       const data = await res.json();
@@ -44,6 +52,10 @@ export default function Chat() {
           ...prev,
           { id: Date.now() + 1, text: data.message, sender: "bot" },
         ]);
+      }
+
+      if (data.summary) {
+        setSummary(data.summary);
       }
     } catch (error) {
       console.error(error);
@@ -94,7 +106,7 @@ export default function Chat() {
           {loading && (
             <div className="flex justify-start">
               <div className="px-4 py-2 bg-gray-200 text-gray-700 rounded-2xl animate-pulse">
-                Typing...
+                Searching...
               </div>
             </div>
           )}
