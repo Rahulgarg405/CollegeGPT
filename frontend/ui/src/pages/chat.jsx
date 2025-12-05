@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+const token = localStorage.getItem("authToken");
 import Button from "../components/button";
 
 export default function Chat() {
@@ -27,7 +28,10 @@ export default function Chat() {
       // yha pe bs tere backend me api/chat tha dekh lena
       const res = await fetch("http://localhost:3000/api/chat/chatbot", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           message: query,
           summary,
