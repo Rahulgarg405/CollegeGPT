@@ -14,7 +14,7 @@ import { PineconeStore } from "@langchain/pinecone";
 
 const embeddings = new GoogleGenerativeAIEmbeddings({
   apiKey: process.env.GEMINI_API_KEY,
-  model: "text-embedding-004",
+  model: "gemini-embedding-001",
 });
 
 const pinecone = new Pinecone();
@@ -29,7 +29,7 @@ export async function indexDocument(
   PDF_PATH,
   semester,
   branch,
-  type = "syllabus"
+  type = "syllabus",
 ) {
   try {
     const pdfLoader = new PDFLoader(PDF_PATH);
@@ -56,7 +56,7 @@ export async function indexDocument(
 
     // 2. Create a separate array of IDs
     const docIds = chunkedDocs.map(
-      (_, i) => `${branch || "common"}-sem${semester || "NA"}--${type}-${i}`
+      (_, i) => `${branch || "common"}-sem${semester || "NA"}--${type}-${i}`,
     );
 
     // 3. FIX: Use Pinecone's $eq (equals) operator for the filter
